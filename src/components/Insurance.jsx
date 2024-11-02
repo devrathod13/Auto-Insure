@@ -2,14 +2,11 @@ import { React, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import Claim from './insurance/Claim';
 import JoinCreate from './insurance/JoinCreate';
-import Pool from './insurance/Pool';
 import User from './insurance/User';
-import Notification from './insurance/Notification';
 import { useAccount } from 'wagmi'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import PolicyNFTs from './insurance/PolicyNFTs';
-import Meeting from './insurance/Meeting';
+
 
 function Insurance() {
 
@@ -121,17 +118,6 @@ function Insurance() {
               </div>
               <div className='bar' style={{
                 backgroundColor: joinMenu ? "#ffffffae" : ""
-              }}></div>
-            </div>
-            <div className='pool-menu'>
-              <div className='image'>
-                <img src="/images/details.png" onClick={poolDetail} />
-                <div className='pool'>
-                  Pool Detail
-                </div>
-              </div>
-              <div className='bar' style={{
-                backgroundColor: poolMenu ? "#ffffffae" : ""
               }}></div>
             </div>
             <div className='claim-menu'>
