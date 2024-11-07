@@ -2,25 +2,23 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
 import { store } from './app/store';
 import { Provider } from 'react-redux';
-
 import { createClient, configureChains, WagmiConfig } from 'wagmi'
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
 import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 import { ConnectKitProvider } from 'connectkit';
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
-import { fantomTestnet, goerli, mainnet} from 'wagmi/chains'
+import { sepolia, goerli, mainnet} from 'wagmi/chains'
 
 
 
 const { chains, provider} = configureChains(
-  [fantomTestnet, goerli, mainnet],
+  [sepolia, goerli, mainnet],
   [
     jsonRpcProvider({
-      rpc: (chain) => ({
+      rpc: () => ({
         http: `https://endpoints.omniatech.io/v1/fantom/testnet/public`,
       }),
     }),
@@ -35,7 +33,7 @@ const client = createClient({
     new CoinbaseWalletConnector({
       chains,
       options: {
-        appName: 'Pinsurnace',
+        appName: 'Auto-Insure',
       },
     }),
     new WalletConnectConnector({
@@ -58,8 +56,5 @@ root.render(
         </ConnectKitProvider>
       </Provider>
     </WagmiConfig>
-
   </>
 );
-
-reportWebVitals();

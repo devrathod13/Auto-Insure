@@ -1,233 +1,156 @@
-import styled from 'styled-components'
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useState } from 'react';
+import { ethers } from 'ethers';
+import styled from 'styled-components';
+
+const contractAddress = '0xC3Ba5050Ec45990f76474163c5bA673c244aaECA'; // Update with your contract address
 
 function Claim() {
+  const [poolId, setPoolId] = useState('');
+  const [claimAmount, setClaimAmount] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState('');
+  
+  const handleClaimRequest = async () => {
+    if (!poolId || !claimAmount) {
+      setError('Please fill in all fields.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(contractAddress, [
+        'function requestClaim(uint256 poolId, uint256 amount) public',
+      ], signer);
+
+      const tx = await contract.requestClaim(poolId, ethers.utils.parseEther(claimAmount));
+      await tx.wait();
+      setSuccess(`Claim successfully requested for ${claimAmount} ETH in Pool ID ${poolId}.`);
+    } catch (err) {
+      setError('Error requesting claim: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Container>
-      <div className='left'>
-        <div className='main-container'>
-          <div className='heading'>
-            <p>Request for Claim</p>
-          </div>
-          <div className='pool-address'>
-            <input type="text" placeholder='Pool Address' onChange={(props) => {
-              let pool = props.target.value
-              setPoolAddress(pool)
-            }} />
-          </div>
-          <div className="upload-amount">
-            <div className='amount-div'>
-              <input type="text" placeholder='Claim amount' onChange={(props) => {
-                let x = props.target.value;
-                setAmount(x);
-              }} />
-            </div>
-          </div>
-        </div>
-      </div>
+      <FormContainer>
+        <Title>Request Claim</Title>
+        {error && <ErrorText>{error}</ErrorText>}
+        {success && <SuccessText>{success}</SuccessText>}
+        
+        <Input
+          type="text"
+          placeholder="Pool ID"
+          value={poolId}
+          onChange={(e) => setPoolId(e.target.value)}
+        />
+        <Input
+          type="number"
+          placeholder="Claim Amount (ETH)"
+          value={claimAmount}
+          onChange={(e) => setClaimAmount(e.target.value)}
+        />
+        <Button onClick={handleClaimRequest} disabled={loading}>
+          {loading ? 'Processing...' : 'Request Claim'}
+        </Button>
+      </FormContainer>
     </Container>
-  )
+  );
 }
 
-export default Claim
+export default Claim;
 
 const Container = styled.div`
-    width: 100%;
-    height: 95%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    padding-top: 1rem;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f1f1f1;
+  padding: 0 20px;
+`;
 
-    .left {
-      flex: 1;
-      height: 100%;
-      display: flex;
-      justify-content: center;
+const FormContainer = styled.div`
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+`;
 
-      .main-container {
-        margin-top: 6rem;
-        height: 70%;
-        width: 70%;
-        background-color: #0152b515;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        overflow: hidden;
-        border-radius: 8px;
+const Title = styled.h2`
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+  font-weight: 600;
+`;
 
-        .heading {
-          width: 99%;
-          height: 2.3rem;
-          display: flex;
-          justify-content: center;
-          align-items: center;
+const ErrorText = styled.p`
+  color: #f44336;
+  font-size: 14px;
+  margin: 10px 0;
+  font-weight: 500;
+`;
 
-          p {
-            margin: 0;
-            margin-top: 10px;
-            color: #0a458d;
-          }
-        }
+const SuccessText = styled.p`
+  color: #4caf50;
+  font-size: 16px;
+  font-weight: bold;
+  margin: 10px 0;
+`;
 
-        .pool-address {
-          margin-top: 1.5rem;
-          height: 2.4rem;
-          width: 93%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          
-          input {
-            width: 100%;
-            height: 2rem;
-            outline: none;
-            border-radius: 6px;
-            border: 1px solid #0152b565;
+const Input = styled.input`
+  padding: 14px 18px;
+  margin: 12px 0;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  width: 100%;
+  max-width: 320px;
+  box-sizing: border-box;
+  background-color: #fafafa;
+  transition: border-color 0.3s ease;
 
-            padding-left: 10px;
-            font-size: 15px;
-          }
-        }
+  &:focus {
+    border-color: #4caf50;
+    outline: none;
+    background-color: #fff;
+  }
+`;
 
-        .upload-amount {
-          height: 2.5rem;
-          width: 92%;
-          margin-top: 1.2rem;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          gap: 20px;
+const Button = styled.button`
+  padding: 14px 20px;
+  font-size: 16px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+  max-width: 320px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 
-          .amount-div {
-            flex: 1;
-            height: 100%;
-            border-radius: 6px;
-            display: flex;
-            justify-content: center;
-            align-content: center;
-            overflow: hidden;
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
 
-            input {
-              width: 100%;
-              height: 90%;
-              outline: none;
-              border-radius: 6px;
-              border: 1px solid #0152b565;
+  &:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+  }
 
-              padding-left: 10px;
-              font-size: 15px;
-            }
-          }
-
-          .upload-div {
-            flex: 1;
-            height: 100%;
-            background-color:  #181717;
-            border-radius: 6px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.15s;
-
-            input {
-              width: 80%;
-              color: white;
-              background-color: #e3dddd2d;
-              border-radius: 2px;
-              cursor: pointer;
-            }
-
-            p {
-              margin:0;
-              font-size: 12px;
-              color: white;
-            }
-          }
-
-        }
-
-        .button {
-          margin-top: 1.2rem;
-          height: 2.5rem;
-          width: 92%;
-          border-radius: 6px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          background-color: #0153b5;
-          transition: opacity 0.15s;
-            cursor: pointer;
-
-            &:hover {
-              opacity: 0.9;
-            }
-
-            &:active {
-              opacity: 0.8;
-            }
-          p {
-            color: white;
-            font-size: 15px;
-          }
-        }
-      }
-    }
-
-    .right {
-      flex: 1;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-
-      .main-container {
-        margin-top: 6rem;
-        height: 70%;
-        width: 70%;
-        background-color: #0152b515;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        overflow: hidden;
-        border-radius: 8px;
-
-        .heading {
-          width: 99%;
-          height: 2.3rem;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-
-          p {
-            margin: 0;
-            margin-top: 10px;
-            color: #0a458d;
-          }
-        }
-
-        .claims-container {
-          margin-top: 15px;
-          height: 100%;
-          width: 88%;
-          overflow: scroll;
-          padding-top: 10px;
-        }
-
-        .placeholder {
-          margin-top: 15px;
-          height: 100%;
-          width: 88%;
-          display: flex;
-          justify-content: center;
-          align-items: start;
-
-          p {
-            margin: 0;
-            margin-top: 3rem;
-          }
-        }
-
-      }
-    }
-`
+  &:active {
+    background-color: #388e3c;
+    transform: translateY(2px);
+  }
+`;
