@@ -7,6 +7,8 @@ function User() {
   const [cubicCapacity, setCubicCapacity] = useState('');
   const [premium, setPremium] = useState('');
   const [poolId, setPoolId] = useState('');
+  const [userName, setUserName] = useState('');  // Added user name state
+  const [supportingDocument, setSupportingDocument] = useState(null); // Added document upload state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [pools, setPools] = useState([]);
@@ -32,12 +34,19 @@ function User() {
     return Math.floor(10000 + Math.random() * 90000).toString();
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSupportingDocument(file);
+    }
+  };
+
   const createPool = async () => {
     setLoading(true);
     setError('');
     try {
-      if (!vehicleModel || !cubicCapacity || !premium) {
-        setError('Please fill in all the pool details');
+      if (!vehicleModel || !cubicCapacity || !premium || !userName || !supportingDocument) {
+        setError('Please fill in all the pool details and upload a document');
         return;
       }
 
@@ -55,7 +64,9 @@ function User() {
         poolId: generatedPoolId,
         vehicleModel,
         cubicCapacity,
-        premium
+        premium,
+        userName, // Adding user name to the pool details
+        supportingDocument: supportingDocument.name // Document name
       };
 
       setPools(prevPools => [...prevPools, newPool]);
@@ -126,6 +137,19 @@ function User() {
               value={premium}
               onChange={(e) => setPremium(e.target.value)}
             />
+            <Input
+              type="text"
+              placeholder="Your Name"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+            />
+            <Input
+              type="file"
+              onChange={handleFileChange}
+            />
+            {supportingDocument && (
+              <DocumentName>{supportingDocument.name}</DocumentName>
+            )}
             <Button
               disabled={loading || poolCreated}
               onClick={createPool}
@@ -144,6 +168,8 @@ function User() {
                   <p><strong>Vehicle Model:</strong> {pool.vehicleModel}</p>
                   <p><strong>Cubic Capacity:</strong> {pool.cubicCapacity}</p>
                   <p><strong>Premium (ETH):</strong> {pool.premium}</p>
+                  <p><strong>User Name:</strong> {pool.userName}</p>
+                  <p><strong>Supporting Document:</strong> {pool.supportingDocument}</p>
                 </PoolDetailsContainer>
               ))}
             </PoolListContainer>
@@ -253,61 +279,34 @@ const Button = styled.button`
 `;
 
 const LoadingText = styled.div`
-  color: #333;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 20px;
-
-  &:before {
-    content: '';
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #4caf50;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    animation: spin 1s linear infinite;
-    margin-right: 10px;
-  }
-
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
+  color: #4caf50;
+  font-size: 18px;
+  font-weight: 600;
 `;
 
-const ErrorText = styled.p`
+const ErrorText = styled.div`
   color: #f44336;
-  font-size: 14px;
-  margin: 10px 0;
-  font-weight: 500;
+  font-size: 16px;
+`;
+
+const DocumentName = styled.div`
+  margin-top: 10px;
+  color: #333;
 `;
 
 const PoolListContainer = styled.div`
   width: 45%;
-  margin-top: 20px;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
   background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-
-  h3 {
-    margin-bottom: 15px;
-    font-size: 18px;
-    color: #333;
-  }
 `;
 
 const PoolDetailsContainer = styled.div`
+  margin-bottom: 15px;
   padding: 10px;
-  margin-top: 10px;
-  border: 1px solid #ddd;
+  background-color: #f9f9f9;
   border-radius: 8px;
-  background-color: #fafafa;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 `;
+
