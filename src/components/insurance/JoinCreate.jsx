@@ -7,14 +7,14 @@ function User() {
   const [cubicCapacity, setCubicCapacity] = useState('');
   const [premium, setPremium] = useState('');
   const [poolId, setPoolId] = useState('');
-  const [userName, setUserName] = useState('');  // Added user name state
-  const [supportingDocument, setSupportingDocument] = useState(null); // Added document upload state
+  const [userName, setUserName] = useState('');
+  const [supportingDocument, setSupportingDocument] = useState(null); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [pools, setPools] = useState([]);
   const [poolCreated, setPoolCreated] = useState(false);
 
-  const contractAddress = '0xC3Ba5050Ec45990f76474163c5bA673c244aaECA'; // Update with your contract address
+  const contractAddress = '0xC3Ba5050Ec45990f76474163c5bA673c244aaECA'; 
 
   useEffect(() => {
     const checkUserAccount = async () => {
@@ -30,7 +30,6 @@ function User() {
   }, []);
 
   const generatePoolId = () => {
-    // Generate a 5-digit pool ID
     return Math.floor(10000 + Math.random() * 90000).toString();
   };
 
@@ -65,8 +64,8 @@ function User() {
         vehicleModel,
         cubicCapacity,
         premium,
-        userName, // Adding user name to the pool details
-        supportingDocument: supportingDocument.name // Document name
+        userName, 
+        supportingDocument: supportingDocument.name 
       };
 
       setPools(prevPools => [...prevPools, newPool]);
