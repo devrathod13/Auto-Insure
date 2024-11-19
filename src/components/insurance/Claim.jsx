@@ -30,7 +30,7 @@ function Claim() {
 
       const tx = await contract.requestClaim(poolId, ethers.utils.parseEther(claimAmount));
       await tx.wait();
-      setSuccess(`Claim successfully requested for ${claimAmount} ETH in Pool ID ${poolId}.`);
+      setSuccess(`Claim requested for ${claimAmount} ETH has been sent successfully for investigation. Thank you for choosing Auto-Insure.`);
     } catch (err) {
       setError('Error requesting claim: ' + err.message);
     } finally {
